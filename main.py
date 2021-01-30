@@ -1,11 +1,13 @@
-from html.parser import HTMLParser
-from requests_html import HTMLSession
-from bs4 import BeautifulSoup
 from requests_html import HTMLSession
 from twilio.rest import Client
 from datetime import datetime
 import requests
 import time
+
+# don't bother with selenium because we have no idea what information they will ask for, since there are
+# currently no appts available, which is why I made this.
+#from selenium import webdriver
+#driver = webdriver.Chrome()
 
 calendly_url = "https://calendly.com/eric-s-covid-vaccine/covid-vaccine?month=2021-02"
 
@@ -43,10 +45,12 @@ def check_for_no_dates_found_button(url, sleeptime):
 	if len(no_dates_found_button) == 1:
 		print(f'{datetime.now().strftime("%H:%M:%S")}: no dates available on calendar {url}')
 		time.sleep(sleeptime)	
-		check_for_no_dates_found_button(url)
+		check_for_no_dates_found_button(url, sleeptime)
 	else:
 		print(f'Found a date on calendar {url}!')
-		send_success_sms()
+		send_success_sms(url)
+		#book_first_available_appt(r, url)
 
-
-check_for_no_dates_found_button(calendly_url, 5 * 60) 
+checking_interval_seconds = 60
+check_for_no_dates_found_button(calendly_url, checking_interval_seconds) 
+#check_for_no_dates_found_button(personal_url, 5 * 60) 
