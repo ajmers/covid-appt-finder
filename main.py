@@ -1,6 +1,6 @@
 import requests
 from twilio.rest import Client
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 import os
 from dotenv import load_dotenv
@@ -12,7 +12,7 @@ CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 client = Client(CLIENT_ID, CLIENT_SECRET)
 covid_calendar = {
     "name": "Eric's RX Covid Vaccines",
-    "url": "https://calendly.com/api/booking/event_types/EBAXZXNO5XL6LLRJ/calendar/range?timezone=America%2FNew_York&diagnostics=false&range_start=2021-02-09&range_end=2021-02-15"}
+    "base_url": "https://calendly.com/api/booking/event_types/EBAXZXNO5XL6LLRJ/calendar/range?timezone=America%2FNew_York&diagnostics=false"}
 
 lawyers_calendar = {
     "name": "Lawyers",
@@ -25,13 +25,23 @@ def send_success_sms(calendar, start_time):
     calendar_name = calendar['name']
     client.messages.create(to="+14842011537",
                            from_="+16178632712",
-                           body=f'Found an appointment for {calendar_name}!! Appointment time: {start_time}')
+                           body= f'Found an appointment for {calendar_name}!! Appointment time: {start_time}')
 
-
+def format_date_range():
+    start = datetime.now()
+    end = start + timedelta(days = 31)
+    
+    date_format = "%Y-%m-%d"
+    formatted_start = datetime.strftime(start, date_format)
+    formatted_end = datetime.strftime(end, date_format)
+    return f'&range_start={formatted_start}&range_end={formatted_end}'
+    
 def check_next_four_weeks():
     calendar = covid_calendar
 
-    resp = requests.get(calendar['url'])
+    request_url = calendar['base_url'] + format_date_range()
+    print("Request URL:", request_url)
+    resp = requests.get(request_url)
     resp_obj = resp.json()
     days = resp_obj['days']
 
