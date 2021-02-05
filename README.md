@@ -20,3 +20,4 @@ Once the calendar is the one you want, run
 
 ## Other customizable parameters:
 - How long should the program sleep before making the next request
+- How many days out to look for appointments
