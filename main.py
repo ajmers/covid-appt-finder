@@ -3,6 +3,7 @@ from twilio.rest import Client
 from datetime import datetime, timedelta
 import time
 import os
+from timer import RepeatedTimer
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -34,9 +35,9 @@ def format_date_range():
     formatted_end = datetime.strftime(end, date_format)
     return f'&range_start={formatted_start}&range_end={formatted_end}'
     
-def check_next_four_weeks():
+def check_calendar_for_availability():
     request_url = calendar['base_url'] + format_date_range()
-    #print("Request URL:", request_url)
+    print("Checking calendar for availability: :", request_url)
     resp = requests.get(request_url)
     resp_obj = resp.json()
     days = resp_obj['days']
@@ -58,18 +59,15 @@ def check_next_four_weeks():
 
     return False
 
-def keep_checking():
-    result = check_next_four_weeks()
+def check_and_log_results():
+    result = check_calendar_for_availability()
 
     if result == True:
-        # found appointment, wait a longer time to check again
+        # found appointment
         print(f'{datetime.now().strftime("%H:%M:%S")}: Found an appointment. Will wait 20 seconds to check again.')
-        time.sleep(20)
-        keep_checking()
     else:
-        # no appointment found, keep checking every minute:
+        # no appointment found:
         print(f'{datetime.now().strftime("%H:%M:%S")}: No appointment found, checking again in 20 seconds.')
-        time.sleep(20)
-        keep_checking()
 
-keep_checking()
+print("starting...")
+rt = RepeatedTimer(20, check_and_log_results) # it auto-starts, no need of rt.start()
