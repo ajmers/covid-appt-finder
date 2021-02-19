@@ -37,7 +37,7 @@ def format_date_range():
     
 def check_calendar_for_availability():
     request_url = calendar['base_url'] + format_date_range()
-    print("Checking calendar for availability: :", request_url)
+    #print("Checking calendar for availability: :", request_url)
     resp = requests.get(request_url)
     resp_obj = resp.json()
     days = resp_obj['days']
